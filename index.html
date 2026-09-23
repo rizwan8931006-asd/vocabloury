@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English-Urdu Vocabulary Builder | انگریزی اردو الفاظ کا ذخیرہ</title>
+  
+  <!-- Google Fonts: Inter & Noto Nastaliq Urdu -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for clean UI icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+
+  <!-- Top Announcement / Daily Spotlight Banner -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <i class="fa-solid fa-book-bookmark"></i>
+        </div>
+        <div class="brand-text">
+          <h1>English-Urdu Vocabulary Builder</h1>
+          <p class="brand-subtitle urdu-text">انگریزی اردو الفاظ کا مستند و جامع ذخیرہ</p>
+        </div>
+      </div>
+
+      <!-- Header Controls: Theme & Stats -->
+      <div class="header-actions">
+        <div class="stat-pill" title="کل دستیاب الفاظ">
+          <i class="fa-solid fa-list-check"></i>
+          <span class="stat-count" id="totalWordsCount">0</span>
+          <span class="stat-label">الفاظ</span>
+        </div>
+        <div class="stat-pill" title="محفوظ شدہ الفاظ">
+          <i class="fa-solid fa-star text-warning"></i>
+          <span class="stat-count" id="bookmarkedCount">0</span>
+          <span class="stat-label">محفوظ</span>
+        </div>
+        <button id="themeToggleBtn" class="icon-btn" title="ڈارک / لائٹ موڈ تبدیل کریں">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="printBtn" class="icon-btn" title="الفاظ کی لسٹ پرنٹ کریں">
+          <i class="fa-solid fa-print"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <button class="nav-tab active" data-tab="cards">
+        <i class="fa-solid fa-table-cells"></i>
+        <span>الفاظ کارڈز (Word Cards)</span>
+      </button>
+      <button class="nav-tab" data-tab="flashcards">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>فلیش کارڈز (Flashcards)</span>
+      </button>
+      <button class="nav-tab" data-tab="quiz">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>کوئز چیلنج (Quiz Test)</span>
+      </button>
+      <button class="nav-tab" data-tab="bookmarks">
+        <i class="fa-solid fa-star"></i>
+        <span>محفوظ الفاظ (Bookmarks)</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="app-main">
+    <!-- Word of the Day Banner -->
+    <section class="wotd-banner" id="wotdBanner">
+      <div class="wotd-card">
+        <div class="wotd-badge">
+          <i class="fa-solid fa-sparkles"></i> آج کا منتخب لفظ (Word of the Day)
+        </div>
+        <div class="wotd-content">
+          <div class="wotd-primary">
+            <div class="wotd-word-group">
+              <h2 id="wotdWord">Resilient</h2>
+              <span class="wotd-phonetic" id="wotdPhonetic">/rɪˈzɪl.jənt/</span>
+              <button class="speak-btn wotd-speak-btn" id="wotdAudioBtn" title="تلفظ سنیں">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+            <span class="wotd-pos" id="wotdPos">Adjective (صفت)</span>
+          </div>
+          <div class="wotd-urdu">
+            <div class="urdu-meaning-large urdu-text" id="wotdUrdu">ثابت قدم، حالات کا مقابلہ کرنے والا</div>
+            <div class="wotd-sentence">
+              <p class="eng-example" id="wotdEngEx">"The resilient nation recovered quickly after the flood."</p>
+              <p class="urdu-example urdu-text" id="wotdUrduEx">"پرعزم قوم نے سیلاب کے بعد تیزی سے بحالی حاصل کی۔"</p>
+            </div>
+          </div>
+        </div>
+        <button class="wotd-shuffle-btn" id="shuffleWotdBtn" title="کوئی دوسرا لفظ دیکھیں">
+          <i class="fa-solid fa-shuffle"></i> نیا لفظ
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 1: WORD CARDS & DICTIONARY VIEW -->
+    <section id="cardsView" class="tab-view active">
+      <!-- Search & Filters Toolbar -->
+      <div class="filter-panel">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="searchInput" placeholder="انگریزی لفظ یا اردو معنی تلاش کریں... (Search English or Urdu)" autocomplete="off">
+          <button id="clearSearchBtn" class="clear-btn" title="سرچ ختم کریں" style="display: none;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="filters-row">
+          <!-- Level selector -->
+          <div class="level-pills" id="levelFilterContainer">
+            <!-- Dynamically populated / styled -->
+          </div>
+
+          <!-- Category selector -->
+          <div class="category-dropdown-wrapper">
+            <select id="categorySelect" class="category-select">
+              <!-- Dynamically populated from CATEGORIES -->
+            </select>
+          </div>
+        </div>
+
+        <!-- A to Z Alphabetical Bar -->
+        <div class="alphabet-bar-wrapper">
+          <span class="alphabet-title">حرف بہ حرف (A-Z):</span>
+          <div class="alphabet-bar" id="alphabetBar">
+            <!-- Dynamically populated A-Z -->
+          </div>
+        </div>
+
+        <!-- Active Filter Indicator & Result Count -->
+        <div class="results-meta">
+          <span id="resultsCountText">نمائش: 160 الفاظ</span>
+          <button id="resetFiltersBtn" class="reset-filter-btn" style="display: none;">
+            <i class="fa-solid fa-rotate-left"></i> فلٹرز ختم کریں
+          </button>
+        </div>
+      </div>
+
+      <!-- Words Grid -->
+      <div class="words-grid" id="wordsGrid">
+        <!-- Word cards will be rendered dynamically by JavaScript -->
+      </div>
+
+      <!-- No Results State -->
+      <div class="empty-state" id="noResultsState" style="display: none;">
+        <i class="fa-solid fa-magnifying-glass empty-icon"></i>
+        <h3>کوئی لفظ نہیں ملا (No Words Found)</h3>
+        <p>آپ کے تلاش کردہ الفاظ یا منتخب کردہ فلٹر سے مطابقت رکھنے والا کوئی لفظ موجود نہیں۔</p>
+        <button class="btn btn-primary" id="emptyResetBtn">تمام الفاظ دکھائیں</button>
+      </div>
+    </section>
+
+    <!-- TAB 2: INTERACTIVE FLASHCARDS VIEW -->
+    <section id="flashcardsView" class="tab-view">
+      <div class="flashcard-container">
+        <div class="flashcard-header">
+          <div class="flashcard-progress-info">
+            <span>کارڈ <strong id="currentCardIndex">1</strong> از <strong id="totalCardsCount">160</strong></span>
+            <span class="category-tag-mini" id="fcCategoryBadge">Daily Life</span>
+          </div>
+          <div class="flashcard-actions-top">
+            <button id="fcBookmarkBtn" class="icon-btn" title="کارڈ بک مارک کریں">
+              <i class="fa-regular fa-star"></i>
+            </button>
+            <button id="fcShuffleBtn" class="icon-btn" title="کارڈز مکس کریں">
+              <i class="fa-solid fa-shuffle"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3D Flippable Card -->
+        <div class="flashcard-scene" id="flashcardScene">
+          <div class="flashcard-inner" id="flashcardInner">
+            <!-- Front Face: English Word -->
+            <div class="flashcard-face flashcard-front">
+              <span class="card-hint">کارڈ پر کلک کر کے معنی دیکھیں <i class="fa-solid fa-arrow-pointer"></i></span>
+              <span class="fc-level-badge" id="fcLevelBadge">Beginner</span>
+              <h2 class="fc-word" id="fcWord">Punctual</h2>
+              <p class="fc-phonetic" id="fcPhonetic">/ˈpʌŋk.tʃu.əl/</p>
+              <span class="fc-pos" id="fcPos">Adjective (صفت)</span>
+              
+              <button class="speak-btn fc-speak-btn" id="fcFrontAudioBtn" title="تلفظ سنیں">
+                <i class="fa-solid fa-volume-high"></i> تلفظ سنیں
+              </button>
+            </div>
+
+            <!-- Back Face: Urdu Meaning & Sentence -->
+            <div class="flashcard-face flashcard-back">
+              <span class="card-hint">واپس جانے کے لیے کلک کریں <i class="fa-solid fa-arrow-rotate-left"></i></span>
+              <div class="fc-back-meaning urdu-text" id="fcUrduMeaning">وقت کا پابند</div>
+              
+              <div class="fc-back-sentence">
+                <p class="fc-eng-sen" id="fcEngExample">"He is always punctual for his classes."</p>
+                <p class="fc-urdu-sen urdu-text" id="fcUrduExample">"وہ اپنی کلاسوں کے لیے ہمیشہ وقت کا پابند رہتا ہے۔"</p>
+              </div>
+
+              <div class="fc-synonyms" id="fcSynonyms">
+                <span class="syn-title">مترادفات (Synonyms):</span>
+                <span id="fcSynonymsList">On time, Prompt</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flashcard Controls -->
+        <div class="flashcard-controls">
+          <button class="btn btn-secondary" id="fcPrevBtn" title="پچھلا کارڈ">
+            <i class="fa-solid fa-chevron-left"></i> پچھلا لفظ
+          </button>
+          <button class="btn btn-primary" id="fcFlipBtn">
+            <i class="fa-solid fa-arrows-rotate"></i> کارڈ پلٹیں (Flip)
+          </button>
+          <button class="btn btn-secondary" id="fcNextBtn" title="اگلا کارڈ">
+            اگلا لفظ <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: QUIZ CHALLENGE VIEW -->
+    <section id="quizView" class="tab-view">
+      <div class="quiz-container">
+        <!-- Quiz Intro Screen -->
+        <div class="quiz-screen" id="quizStartScreen">
+          <div class="quiz-intro-box">
+            <div class="quiz-icon-circle">
+              <i class="fa-solid fa-award"></i>
+            </div>
+            <h2>انگریزی وکیبلری ٹیسٹ (Vocabulary Challenge)</h2>
+            <p class="urdu-text">اپنی انگریزی وکیبلری کی جانچ کریں! متعدد انتخابی سوالات حل کر کے اپنے ذخیرہ الفاظ کو مضبوط بنائیں۔</p>
+
+            <div class="quiz-options-group">
+              <label>ٹیسٹ کی قسم منتخب کریں (Quiz Mode):</label>
+              <div class="quiz-mode-select">
+                <label class="mode-radio">
+                  <input type="radio" name="quizMode" value="engToUrdu" checked>
+                  <span>انگلش لفظ ➔ درست اردو معنی (English to Urdu)</span>
+                </label>
+                <label class="mode-radio">
+                  <input type="radio" name="quizMode" value="urduToEng">
+                  <span>اردو معنی ➔ درست انگلش لفظ (Urdu to English)</span>
+                </label>
+              </div>
+
+              <label>سوالات کی تعداد (Questions Count):</label>
+              <div class="quiz-count-select">
+                <button class="count-btn active" data-count="10">10 سوالات</button>
+                <button class="count-btn" data-count="20">20 سوالات</button>
+                <button class="count-btn" data-count="30">30 سوالات</button>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-large" id="startQuizBtn">
+              <i class="fa-solid fa-play"></i> کوئز شروع کریں (Start Quiz)
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Quiz Question Screen -->
+        <div class="quiz-screen" id="quizActiveScreen" style="display: none;">
+          <div class="quiz-top-bar">
+            <div class="quiz-q-tracker">
+              سوال <span id="quizCurrentQNum">1</span> از <span id="quizTotalQNum">10</span>
+            </div>
+            <div class="quiz-score-badge">
+              اسکور: <span id="quizScore">0</span>
+            </div>
+          </div>
+          
+          <div class="quiz-progress-track">
+            <div class="quiz-progress-fill" id="quizProgressFill" style="width: 10%;"></div>
+          </div>
+
+          <div class="quiz-question-box">
+            <span class="quiz-prompt-label" id="quizPromptLabel">اس لفظ کا درست اردو معنی منتخب کریں:</span>
+            <div class="quiz-prompt-word-wrapper">
+              <h2 class="quiz-prompt-word" id="quizQuestionWord">Resilient</h2>
+              <button class="speak-btn" id="quizSpeakBtn" title="لفظ سنیں">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+            <p class="quiz-prompt-sub" id="quizPromptSub">Adjective (صفت)</p>
+          </div>
+
+          <!-- Multiple choice options -->
+          <div class="quiz-options-grid" id="quizOptionsGrid">
+            <!-- Dynamically populated 4 options -->
+          </div>
+
+          <!-- Feedback & Next Question button -->
+          <div class="quiz-footer" id="quizFooter" style="display: none;">
+            <div class="quiz-feedback" id="quizFeedback"></div>
+            <button class="btn btn-primary" id="quizNextBtn">
+              اگلا سوال <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quiz Completed Screen -->
+        <div class="quiz-screen" id="quizResultScreen" style="display: none;">
+          <div class="quiz-result-box">
+            <div class="result-badge-circle" id="resultCircle">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 id="resultTitle">بہترین کوشش!</h2>
+            <p class="urdu-text" id="resultSubtitle">آپ نے کوئز مکمل کر لیا ہے۔</p>
+
+            <div class="result-stats">
+              <div class="result-stat-item">
+                <span class="stat-num" id="finalScoreText">8/10</span>
+                <span class="stat-desc">درست جوابات</span>
+              </div>
+              <div class="result-stat-item">
+                <span class="stat-num" id="finalPercentText">80%</span>
+                <span class="stat-desc">کامیابی کا تناسب</span>
+              </div>
+            </div>
+
+            <div class="result-actions">
+              <button class="btn btn-primary" id="retryQuizBtn">
+                <i class="fa-solid fa-rotate-right"></i> دوبارہ ٹیسٹ دیں
+              </button>
+              <button class="btn btn-secondary" id="returnToCardsBtn">
+                <i class="fa-solid fa-book-open"></i> الفاظ کی فہرست دیکھیں
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: BOOKMARKS / SAVED WORDS VIEW -->
+    <section id="bookmarksView" class="tab-view">
+      <div class="bookmarks-header">
+        <div class="bookmarks-meta">
+          <h2><i class="fa-solid fa-star text-warning"></i> آپ کے محفوظ شدہ الفاظ</h2>
+          <p class="urdu-text">جن الفاظ کو یاد رکھنے میں مشکل ہو، ان پر ستارے (Star) کے نشان سے محفوظ کریں تاکہ آپ ان کی بار بار دہرائی کر سکیں۔</p>
+        </div>
+        <button class="btn btn-secondary" id="clearAllBookmarksBtn">
+          <i class="fa-solid fa-trash-can"></i> تمام محفوظ الفاظ صاف کریں
+        </button>
+      </div>
+
+      <div class="words-grid" id="bookmarksGrid">
+        <!-- Starred cards will render here -->
+      </div>
+
+      <div class="empty-state" id="noBookmarksState" style="display: none;">
+        <i class="fa-regular fa-star empty-icon"></i>
+        <h3>کوئی محفوظ لفظ نہیں ہے (No Saved Words)</h3>
+        <p class="urdu-text">آپ نے ابھی تک کوئی لفظ بک مارک نہیں کیا۔ کارڈ پر بنے ستارے (Star) پر کلک کر کے کسی بھی لفظ کو یہاں محفوظ کریں۔</p>
+        <button class="btn btn-primary" id="browseWordsBtn">الفاظ براؤز کریں</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Learning Guide & Tips Section -->
+  <section class="tips-section">
+    <div class="tips-container">
+      <h3><i class="fa-solid fa-lightbulb"></i> انگریزی وکیبلری یاد رکھنے کی بہترین تدابیر</h3>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <span class="tip-num">1</span>
+          <h4>روزانہ 5 نئے الفاظ</h4>
+          <p class="urdu-text">ایک ساتھ درجنوں الفاظ رٹنے کے بجائے روزانہ صرف 5 الفاظ منتخب کریں اور ان کا استعمال سیکھیں۔</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-num">2</span>
+          <h4>صحیح تلفظ سنیں</h4>
+          <p class="urdu-text">کارڈز پر موجود اسپیکر کے بٹن پر کلک کر کے بار بار لفظ کا انگریزی تلفظ غور سے سنیں اور دہرائیں۔</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-num">3</span>
+          <h4>جملوں میں استعمال</h4>
+          <p class="urdu-text">صرف ترجمہ یاد نہ کریں بلکہ دیے گئے جملوں کو پڑھیں اور روزمرہ گفتگو میں بولنے کی کوشش کریں۔</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-num">4</span>
+          <h4>کوئز سے جانچ</h4>
+          <p class="urdu-text">ہفتے میں دو بار کوئز سیکشن میں جا کر ٹیسٹ حل کریں تاکہ ذہن میں الفاظ پختہ ہو جائیں۔</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <p>English-Urdu Vocabulary Learning Platform &bull; علم بانٹنے سے بڑھتا ہے</p>
+    <p class="footer-note">تیار کردہ برائے آسان اور مؤثر انگریزی اردو سیکھنے کے عمل کے لیے</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="words-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
