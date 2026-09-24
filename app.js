@@ -31,7 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     quizAnswered: false,
 
     // Theme
-    theme: localStorage.getItem('vocab_theme') || 'light'
+    theme: localStorage.getItem('vocab_theme') || 'light',
+
+    // Phrases State
+    allPhrases: typeof PHRASES_DATA !== 'undefined' ? PHRASES_DATA : [],
+    filteredPhrases: [],
+    selectedPhraseCat: 'All',
+    selectedPhraseLevel: 'All',
+    phraseSearchQuery: ''
   };
 
   // ------------------------------------------
@@ -124,7 +131,17 @@ document.addEventListener('DOMContentLoaded', () => {
     bookmarksGrid: document.getElementById('bookmarksGrid'),
     noBookmarksState: document.getElementById('noBookmarksState'),
     clearAllBookmarksBtn: document.getElementById('clearAllBookmarksBtn'),
-    browseWordsBtn: document.getElementById('browseWordsBtn')
+    browseWordsBtn: document.getElementById('browseWordsBtn'),
+
+    // Phrases Elements
+    phrasesGrid: document.getElementById('phrasesGrid'),
+    phraseSearchInput: document.getElementById('phraseSearchInput'),
+    clearPhraseSearchBtn: document.getElementById('clearPhraseSearchBtn'),
+    phraseCatPills: document.getElementById('phraseCatPills'),
+    phraseLevelPills: document.getElementById('phraseLevelPills'),
+    phrasesCountText: document.getElementById('phrasesCountText'),
+    noPhrasesState: document.getElementById('noPhrasesState'),
+    resetPhrasesBtn: document.getElementById('resetPhrasesBtn')
   };
 
   // ------------------------------------------
@@ -212,6 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (tabId === 'bookmarks') {
       document.getElementById('bookmarksView').classList.add('active');
       renderBookmarks();
+    } else if (tabId === 'phrases') {
+      document.getElementById('phrasesView').classList.add('active');
+      renderPhrases();
     }
   }
 
@@ -857,6 +877,157 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ------------------------------------------
+  // Phrases Engine & Rendering
+  // ------------------------------------------
+  function initPhrases() {
+    if (!DOM.phraseCatPills || !DOM.phraseLevelPills) return;
+
+    // Render Category Pills
+    const categories = typeof PHRASE_CATEGORIES !== 'undefined' ? PHRASE_CATEGORIES : [
+      { id: "All", label: "تمام (All Phrases)", icon: "🗣️" }
+    ];
+
+    DOM.phraseCatPills.innerHTML = '';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = `phrase-cat-btn ${state.selectedPhraseCat === cat.id ? 'active' : ''}`;
+      btn.innerHTML = `${cat.icon || '💬'} <span>${cat.label}</span>`;
+      btn.addEventListener('click', () => {
+        state.selectedPhraseCat = cat.id;
+        document.querySelectorAll('.phrase-cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyPhraseFilters();
+      });
+      DOM.phraseCatPills.appendChild(btn);
+    });
+
+    // Render Level Pills
+    const levels = ['All', 'Beginner', 'Intermediate', 'Advanced'];
+    DOM.phraseLevelPills.innerHTML = '';
+    levels.forEach(lvl => {
+      const btn = document.createElement('button');
+      btn.className = `filter-pill ${state.selectedPhraseLevel === lvl ? 'active' : ''}`;
+      btn.setAttribute('data-level', lvl);
+      btn.textContent = lvl === 'All' ? 'تمام' : lvl;
+      btn.addEventListener('click', () => {
+        state.selectedPhraseLevel = lvl;
+        DOM.phraseLevelPills.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyPhraseFilters();
+      });
+      DOM.phraseLevelPills.appendChild(btn);
+    });
+
+    // Search Input
+    DOM.phraseSearchInput?.addEventListener('input', (e) => {
+      state.phraseSearchQuery = e.target.value.trim().toLowerCase();
+      if (DOM.clearPhraseSearchBtn) {
+        DOM.clearPhraseSearchBtn.style.display = state.phraseSearchQuery ? 'flex' : 'none';
+      }
+      applyPhraseFilters();
+    });
+
+    DOM.clearPhraseSearchBtn?.addEventListener('click', () => {
+      DOM.phraseSearchInput.value = '';
+      state.phraseSearchQuery = '';
+      DOM.clearPhraseSearchBtn.style.display = 'none';
+      applyPhraseFilters();
+    });
+
+    DOM.resetPhrasesBtn?.addEventListener('click', () => {
+      state.selectedPhraseCat = 'All';
+      state.selectedPhraseLevel = 'All';
+      state.phraseSearchQuery = '';
+      if (DOM.phraseSearchInput) DOM.phraseSearchInput.value = '';
+      if (DOM.clearPhraseSearchBtn) DOM.clearPhraseSearchBtn.style.display = 'none';
+      initPhrases();
+      applyPhraseFilters();
+    });
+
+    applyPhraseFilters();
+  }
+
+  function applyPhraseFilters() {
+    let filtered = [...state.allPhrases];
+
+    if (state.selectedPhraseCat !== 'All') {
+      filtered = filtered.filter(p => p.category === state.selectedPhraseCat);
+    }
+
+    if (state.selectedPhraseLevel !== 'All') {
+      filtered = filtered.filter(p => p.level === state.selectedPhraseLevel);
+    }
+
+    if (state.phraseSearchQuery) {
+      const q = state.phraseSearchQuery;
+      filtered = filtered.filter(p =>
+        (p.phrase && p.phrase.toLowerCase().includes(q)) ||
+        (p.urduTranslation && p.urduTranslation.includes(q)) ||
+        (p.explanation && p.explanation.toLowerCase().includes(q)) ||
+        (p.urduExplanation && p.urduExplanation.includes(q))
+      );
+    }
+
+    state.filteredPhrases = filtered;
+    renderPhrases();
+  }
+
+  function renderPhrases() {
+    if (!DOM.phrasesGrid) return;
+    DOM.phrasesGrid.innerHTML = '';
+
+    if (DOM.phrasesCountText) {
+      DOM.phrasesCountText.textContent = `${state.filteredPhrases.length} جملے`;
+    }
+
+    if (state.filteredPhrases.length === 0) {
+      if (DOM.noPhrasesState) DOM.noPhrasesState.style.display = 'block';
+      return;
+    }
+
+    if (DOM.noPhrasesState) DOM.noPhrasesState.style.display = 'none';
+
+    state.filteredPhrases.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'phrase-card';
+
+      card.innerHTML = `
+        <div class="phrase-card-header">
+          <div class="phrase-text">${escapeHtml(p.phrase)}</div>
+          <div class="phrase-meta-row">
+            <span class="phrase-cat-badge"><i class="fa-solid fa-tag"></i> ${escapeHtml(p.category)}</span>
+            <span class="phrase-level-badge">${escapeHtml(p.level)}</span>
+          </div>
+        </div>
+        <div class="phrase-card-body">
+          <div class="phrase-urdu-box">
+            <span class="phrase-urdu-label">اردو ترجمہ (Urdu Meaning):</span>
+            <div class="phrase-urdu-text urdu-text">${escapeHtml(p.urduTranslation)}</div>
+          </div>
+          <div class="phrase-explanation-box">
+            <span class="phrase-exp-label"><i class="fa-solid fa-circle-info"></i> وضاحت (Explanation):</span>
+            <p class="phrase-exp-en">${escapeHtml(p.explanation)}</p>
+            <p class="phrase-exp-ur urdu-text">${escapeHtml(p.urduExplanation)}</p>
+          </div>
+          ${p.example ? `
+          <div class="phrase-example-box">
+            <span class="phrase-example-label"><i class="fa-solid fa-pen-fancy"></i> مثال (Example):</span>
+            <p class="phrase-example-en">"${escapeHtml(p.example)}"</p>
+            <p class="phrase-example-ur urdu-text">"${escapeHtml(p.urduExample || '')}"</p>
+          </div>` : ''}
+          ${p.whenToUse ? `
+          <div class="phrase-when-to-use">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span><strong>استعمال کا موقع:</strong> ${escapeHtml(p.whenToUse)}</span>
+          </div>` : ''}
+        </div>
+      `;
+
+      DOM.phrasesGrid.appendChild(card);
+    });
+  }
+
+  // ------------------------------------------
   // App Initialization
   // ------------------------------------------
   function initApp() {
@@ -866,6 +1037,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pickWotd(false);
     initFilters();
     renderCards();
+    initPhrases();
   }
 
   initApp();
