@@ -71,6 +71,10 @@
         <i class="fa-solid fa-star"></i>
         <span>محفوظ الفاظ (Bookmarks)</span>
       </button>
+      <button class="nav-tab" data-tab="phrases">
+        <i class="fa-solid fa-comments"></i>
+        <span>جملے و اظہارات (Phrases)</span>
+      </button>
     </div>
   </nav>
 
@@ -363,6 +367,55 @@
         <h3>کوئی محفوظ لفظ نہیں ہے (No Saved Words)</h3>
         <p class="urdu-text">آپ نے ابھی تک کوئی لفظ بک مارک نہیں کیا۔ کارڈ پر بنے ستارے (Star) پر کلک کر کے کسی بھی لفظ کو یہاں محفوظ کریں۔</p>
         <button class="btn btn-primary" id="browseWordsBtn">الفاظ براؤز کریں</button>
+      </div>
+    </section>
+
+    <!-- TAB 5: PHRASES & EXPRESSIONS VIEW -->
+    <section id="phrasesView" class="tab-view">
+
+      <!-- Phrases Header -->
+      <div class="phrases-header">
+        <div class="phrases-header-text">
+          <h2><i class="fa-solid fa-comments"></i> انگریزی جملے اور اظہارات (English Phrases)</h2>
+          <p class="urdu-text">روزمرہ استعمال کے اہم انگریزی جملے، محاورے، اور اظہارات — اردو ترجمہ اور مکمل وضاحت کے ساتھ</p>
+        </div>
+        <div class="phrases-stats-pill">
+          <i class="fa-solid fa-quote-left"></i>
+          <span id="phrasesCountText">48 جملے</span>
+        </div>
+      </div>
+
+      <!-- Phrase Filters -->
+      <div class="phrase-filter-bar">
+        <div class="phrase-search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="phraseSearchInput" placeholder="جملہ تلاش کریں... (Search phrases)" autocomplete="off">
+          <button id="clearPhraseSearchBtn" class="clear-btn" style="display:none;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="phrase-cat-pills" id="phraseCatPills">
+          <!-- dynamically populated -->
+        </div>
+        <div class="phrase-level-select-row">
+          <label class="phrase-level-label">درجہ:</label>
+          <div class="level-pills" id="phraseLevelPills">
+            <!-- dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Phrases Grid -->
+      <div class="phrases-grid" id="phrasesGrid">
+        <!-- Phrase cards rendered by JS -->
+      </div>
+
+      <!-- No Results -->
+      <div class="empty-state" id="noPhrasesState" style="display:none;">
+        <i class="fa-solid fa-comment-slash empty-icon"></i>
+        <h3>کوئی جملہ نہیں ملا (No Phrase Found)</h3>
+        <p>آپ کی تلاش سے مطابقت رکھنے والا کوئی جملہ موجود نہیں۔</p>
+        <button class="btn btn-primary" id="resetPhrasesBtn">تمام جملے دکھائیں</button>
       </div>
     </section>
   </main>
